@@ -6,39 +6,38 @@
 
 所有代码：
 
-// demo_02.cpp : 定义控制台应用程序的入口点。
-//
-
-#include "stdafx.h"
-#include <iostream>
-using namespace std;
-#include "./gdal/gdal_priv.h"
-#pragma comment(lib, "gdal_i.lib")
-
-int main()
-{
-​	//输入图像
-​	GDALDataset* poSrcDS;
-​	//输出图像
-​	GDALDataset* poDstDS;
-​	//图像的宽度和高度
-​	int imgXlen, imgYlen;
-​	//输入图像路径
-​	char* srcPath = "wusi1.jpg";
-​	//输出图像路径
-​	char* dstPath = "wusi2.tif";
-​	//图像内存存储
-​	GByte* buffTmp;
-​	GByte* buffTmp2;
-​	//图像波段数
-​	int i, j, bandNum;
-​	//起始位置坐标
-​	int startX = 100;
-​	int startY = 100;
-​	//区域高度和宽度
-​	int tmpXlen = 200;
-​	int tmpYlen = 150;
-
+	// demo_02.cpp : 定义控制台应用程序的入口点。
+	//
+	
+	#include "stdafx.h"
+	#include <iostream>
+	using namespace std;
+	#include "./gdal/gdal_priv.h"
+	#pragma comment(lib, "gdal_i.lib")
+	
+	int main()
+	{
+	//输入图像
+	GDALDataset* poSrcDS;
+	//输出图像
+	GDALDataset* poDstDS;
+	//图像的宽度和高度
+	int imgXlen, imgYlen;
+	//输入图像路径
+	char* srcPath = "wusi1.jpg";
+	//输出图像路径
+	char* dstPath = "wusi2.tif";
+	//图像内存存储
+	GByte* buffTmp;
+	GByte* buffTmp2;
+	//图像波段数
+	int i, j, bandNum;
+	//起始位置坐标
+	int startX = 100;
+	int startY = 100;
+	//区域高度和宽度
+	int tmpXlen = 200;
+	int tmpYlen = 150;
 	//注册驱动
 	GDALAllRegister();
 	
@@ -93,8 +92,7 @@ int main()
 	
 	system("PAUSE");
 	return 0;
-}
-
+	}
 输出结果：
 
 ![](http://ww1.sinaimg.cn/large/006AVk9bly1fwg2ro4um0j30ur0jr0ti.jpg)
@@ -107,44 +105,43 @@ int main()
 
 所有代码：
 
-// demo_02.cpp : 定义控制台应用程序的入口点。
-//
-
-#include "stdafx.h"
-#include <iostream>
-using namespace std;
-#include "./gdal/gdal_priv.h"
-#pragma comment(lib, "gdal_i.lib")
-
-int main()
-{
-​	//输入图像
-​	GDALDataset* poSrcDS;
-​	//输出图像
-​	GDALDataset* poDstDS;
-​	//图像的宽度和高度
-​	int imgXlen, imgYlen;
-​	//输入图像路径
-​	char* srcPath = "wusi1.jpg";
-​	//输出图像路径
-​	char* dstPath = "wusi3.tif";
-​	//图像内存存储
-​	GByte* buffTmp;
-​	GByte* buffTmp2;
-​	GByte* buffTmp3;
-​	//图像波段数
-​	int i, j, k, bandNum;
-​	//起始位置坐标
-​	int startX = 300;
-​	int startY = 300;
-​	int startX2 = 500;
-​	int startY2 = 500;
-​	//区域高度和宽度
-​	int tmpXlen = 100;
-​	int tmpYlen = 50;
-​	int tmpXlen2 = 50;
-​	int tmpYlen2 = 100;
-
+	// demo_02.cpp : 定义控制台应用程序的入口点。
+	//
+	
+	#include "stdafx.h"
+	#include <iostream>
+	using namespace std;
+	#include "./gdal/gdal_priv.h"
+	#pragma comment(lib, "gdal_i.lib")
+	
+	int main()
+	{
+	//输入图像
+	GDALDataset* poSrcDS;
+	//输出图像
+	GDALDataset* poDstDS;
+	//图像的宽度和高度
+	int imgXlen, imgYlen;
+	//输入图像路径
+	char* srcPath = "wusi1.jpg";
+	//输出图像路径
+	char* dstPath = "wusi3.tif";
+	//图像内存存储
+	GByte* buffTmp;
+	GByte* buffTmp2;
+	GByte* buffTmp3;
+	//图像波段数
+	int i, j, k, bandNum;
+	//起始位置坐标
+	int startX = 300;
+	int startY = 300;
+	int startX2 = 500;
+	int startY2 = 500;
+	//区域高度和宽度
+	int tmpXlen = 100;
+	int tmpYlen = 50;
+	int tmpXlen2 = 50;
+	int tmpYlen2 = 100;
 	//注册驱动
 	GDALAllRegister();
 	
@@ -219,8 +216,7 @@ int main()
 	
 	system("PAUSE");
 	return 0;
-}
-
+	}
 问题：
 
 在实验过程中由于部分参数使用混乱，导致输出图像仍为原图，修改后得到实验结果。
