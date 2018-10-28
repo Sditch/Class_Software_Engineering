@@ -8,3 +8,5 @@ Members' blog
 
 - [x] experiment1 Windows platform
 
+- [x] experiment 2 Mac platform
+- [x] experiment 2 Windows platform
