@@ -10,3 +10,5 @@ Members' blog
 
 - [x] experiment 2 Mac platform
 - [x] experiment 2 Windows platform
+
+- [x] experiment 3 Windows platform
