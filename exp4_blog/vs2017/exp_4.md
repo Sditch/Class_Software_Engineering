@@ -19,37 +19,37 @@
 
 注意：
 
-###1、数组求和定义类型为double类型，因为存在小数运算<br>
+###1、数组求和定义类型为float类型，因为存在小数运算<br>
 最开始按思路写出输出图像全黑，后来才发现乘积小数小于1时，类型转换为0了
-###2、double类型运算后需要强制类型转换为GByte，否则类型不符容易报错
+###2、float类型是重点
 ###3、注意读取当前像素点[i, j]的相邻区域时，相邻区域点的坐标为[i+a-1, j+b-1]
 
 算法：
 
 	// 数组求和
-	double sum[1] = { 0 };
+	float sum[1] = { 0 };
 	for (int i = 1; i < imgYlen-1; ++i)
 	{
 		for (int j = 1; j < imgXlen-1; ++j)
 		{
 			for (int k = 0; k < bandNum; ++k)
 			{
-				sum[0] = 0;
-				for (int a = 0; a < 3; ++a)
+				sum[0] = 0.0;
+					// for循环求和---每个像素点的像素值
+				for (int a = 0; a < array; ++a)
 				{
-					for (int b = 0; b < 3; ++b)
+					for (int b = 0; b < array; ++b)
 					{
+						//读取数组的像素点
 						poSrcDS->GetRasterBand(k + 1)->RasterIO(GF_Read,
-							i + a - 1, j + b - 1, 1, 1, buffTmp, 1, 1, GDT_Byte, 0, 0);
+							i + a - array / 2, j + b - array / 2, 1, 1, buffTmp, 1, 1, GDT_Float32, 0, 0);
 						buff[a][b] = buffTmp[0];
-						sum[0] += (double)buff[a][b] * buffArray[a][b];
+						sum[0] += buff[a][b] * buffArray[a][b];
 						//cout << buff[a][b] << "   " << sum[0] << endl;
 					}
 				}
-				GByte pre[1];
-				pre[0] = (GByte)sum[0];
 				poDstDS->GetRasterBand(k + 1)->RasterIO(GF_Write,
-					i, j, 1, 1, pre, 1, 1, GDT_Byte, 0, 0);
+					i, j, 1, 1, sum, 1, 1, GDT_Float32, 0, 0);
 			}
 
 		}
@@ -60,12 +60,13 @@
 ###2、为了统一调用，我将所有数组定义为5x5大小，可是3x3类型的卷积核出现问题，原因在于：数组计算是从左到右依次进行的，每行应该补上空缺的2个数0，否则使用的第二行第一个数可能是实际的第二行第3个数
 定义示例：
 
-	double buffArray_1[5][5] = {
+	float buffArray_1[5][5] = {
 		0, 1 * 0.2, 0, 0, 0,
 		1 * 0.2, 1 * 0.2, 1 * 0.2, 0, 0,
 		0, 1 * 0.2, 0, 0, 0
 	};
 ###3、忘记卷积核六求和后的除以25，导致实验结果的不一致
+###4、重点问题：后来运行老师代码发现实验结果与我的结果不一致，看老师代码才发现是float类型的原因，折腾了好久。。。这意味着代码、截图、博客全部需要改正
 ##四、完整代码
 
 	#include <iostream>
@@ -73,12 +74,10 @@
 	#include "./gdal/gdal_priv.h"
 	#pragma comment(lib, "gdal_i.lib")
 	
-	void inputIMG(int imgXlen, int imgYlen, int bandNum, int array, double buffArray[][5], GDALDataset* poSrcDS, GDALDataset* poDstDS, GByte* buffTmp, GByte buff[][5])
+	void inputIMG(int imgXlen, int imgYlen, int bandNum, int array, float buffArray[][5], GDALDataset* poSrcDS, GDALDataset* poDstDS, float* buffTmp, float buff[][5])
 	{
-		// 数组求和double类型
-		double sum[1] = { 0.0 };
-		// 数组求和GByte类型
-		GByte pre[1] = { 0 };
+		// 数组求和float类型
+		float sum[1] = { 0.0 };
 		// 多个for循环嵌套
 		for (int i = array / 2; i < imgYlen - array / 2; ++i)
 		{
@@ -94,16 +93,15 @@
 						{
 							//读取数组的像素点
 							poSrcDS->GetRasterBand(k + 1)->RasterIO(GF_Read,
-								i + a - array / 2, j + b - array / 2, 1, 1, buffTmp, 1, 1, GDT_Byte, 0, 0);
+								i + a - array / 2, j + b - array / 2, 1, 1, buffTmp, 1, 1, GDT_Float32, 0, 0);
 							buff[a][b] = buffTmp[0];
-							sum[0] += (double)buff[a][b] * buffArray[a][b];
+							sum[0] += buff[a][b] * buffArray[a][b];
 							//cout << buff[a][b] << "   " << sum[0] << endl;
 						}
 					}
 	
-					pre[0] = (GByte)sum[0];
 					poDstDS->GetRasterBand(k + 1)->RasterIO(GF_Write,
-						i, j, 1, 1, pre, 1, 1, GDT_Byte, 0, 0);
+						i, j, 1, 1, sum, 1, 1, GDT_Float32, 0, 0);
 				}
 			}
 		}
@@ -114,7 +112,7 @@
 	{
 		// 输入头像
 		GDALDataset* poSrcDS;
-		// 输出头像
+		// Êä³öÍ·Ïñ
 		GDALDataset* poDstDS_1;
 		GDALDataset* poDstDS_2;
 		GDALDataset* poDstDS_3;
@@ -126,14 +124,14 @@
 		// 输入图像路径
 		char* srcPath = "lena.jpg";
 		// 输出图像路径----卷积核一
-		char* dstPath_1 = "newlena1.tif";
-		char* dstPath_2 = "newlena2.tif";
-		char* dstPath_3 = "newlena3.tif";
-		char* dstPath_4 = "newlena4.tif";
-		char* dstPath_5 = "newlena5.tif";
-		char* dstPath_6 = "newlena6.tif";
+		char* dstPath_1 = "newlena1_1.tif";
+		char* dstPath_2 = "newlena2_1.tif";
+		char* dstPath_3 = "newlena3_1.tif";
+		char* dstPath_4 = "newlena4_1.tif";
+		char* dstPath_5 = "newlena5_1.tif";
+		char* dstPath_6 = "newlena6_1.tif";
 		// 图像内存存储
-		GByte* buffTmp;
+		float* buffTmp;
 		// 图像波段数
 		int bandNum;
 	
@@ -167,15 +165,15 @@
 			dstPath_6, imgXlen, imgYlen, bandNum, GDT_Byte, NULL);
 	
 		// 根据图像的宽度和高度分配内存
-		buffTmp = (GByte*)CPLMalloc(imgXlen*imgYlen * sizeof(GByte));
+		buffTmp = (float*)CPLMalloc(imgXlen*imgYlen * sizeof(float));
 		// 卷积核数组，记录数组维度
-		double buffArray_1[5][5] = {
+		float buffArray_1[5][5] = {
 			0, 1 * 0.2, 0, 0, 0,
 			1 * 0.2, 1 * 0.2, 1 * 0.2, 0, 0,
 			0, 1 * 0.2, 0, 0, 0
 		};
 		int array_1 = 3;
-		double buffArray_2[5][5] = {
+		float buffArray_2[5][5] = {
 			1 * 0.2, 0, 0, 0, 0,
 			0, 1 * 0.2, 0, 0 ,0,
 			0, 0, 1 * 0.2, 0, 0,
@@ -183,25 +181,25 @@
 			0, 0, 0, 0, 1 * 0.2
 		};
 		int array_2 = 5;
-		double buffArray_3[5][5] = {
+		float buffArray_3[5][5] = {
 			-1, -1, -1, 0, 0,
 			-1, 8, -1, 0, 0,
 			-1, -1, -1, 0, 0
 		};
 		int array_3 = 3;
-		double buffArray_4[5][5] = {
+		float buffArray_4[5][5] = {
 			-1, -1, -1, 0, 0,
 			-1, 9, -1, 0, 0,
 			-1, -1, -1, 0, 0
 		};
 		int array_4 = 3;
-		double buffArray_5[5][5] = {
+		float buffArray_5[5][5] = {
 			-1, -1, 0, 0, 0,
-			-1, 0, -1, 0, 0,
-			0, -1, -1, 0, 0
+			-1, 0, 1, 0, 0,
+			0, 1, 1, 0, 0
 		};
 		int array_5 = 3;
-		double buffArray_6[5][5] = {
+		float buffArray_6[5][5] = {
 			0.0120 / 25, 0.1253 / 25, 0.2736 / 25, 0.1253 / 25, 0.0120 / 25,
 			0.1253 / 25, 1.3054 / 25, 2.8514 / 25, 1.3054 / 25, 0.1253 / 25,
 			0.2736 / 25, 2.8514 / 25, 6.2279 / 25, 2.8514 / 25, 0.2736 / 25,
@@ -210,13 +208,13 @@
 		};
 		int array_6 = 5;
 		// 开创数组用于存储像素点，方便后面数组乘机
-		GByte buff[5][5];
+		float buff[5][5];
 	
 		for (int i = 0; i < 5; ++i)
 		{
 			for (int j = 0; j < 5; ++j)
 			{
-				buff[i][j] = 0;
+				buff[i][j] = 0.0;
 			}
 		}
 	
@@ -252,26 +250,26 @@
 
 * newlena1.tif------均值模糊:
 
-![](https://i.imgur.com/8PF8fip.png)
+![](https://i.imgur.com/Fr1IoBj.png)
 
 
 * newlena2.tif------运动模糊:
 
-![](https://i.imgur.com/8jCd81x.jpg)
+![](https://i.imgur.com/Jt5ACn9.png)
 
 * newlena3.tif------边缘检测:
 
-![](https://i.imgur.com/B28YI2J.jpg)
+![](https://i.imgur.com/HE3WM8s.png)
 
 
 * newlena4.tif------图像锐化滤波器:
 
-![](https://i.imgur.com/U1Y3Erg.jpg)
+![](https://i.imgur.com/WQPIzZG.png)
 
 * newlena5.tif------浮雕:
 
-![](https://i.imgur.com/yKBaQO1.jpg)
+![](https://i.imgur.com/2Uhtu3D.png)
 
 * newlena6.tif------高斯模糊:
 
-![](https://i.imgur.com/XN3j7xR.jpg)
+![](https://i.imgur.com/VB6xmPk.png)
