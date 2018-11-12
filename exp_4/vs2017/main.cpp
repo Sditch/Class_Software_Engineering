@@ -3,12 +3,10 @@ using namespace std;
 #include "./gdal/gdal_priv.h"
 #pragma comment(lib, "gdal_i.lib")
 
-void inputIMG(int imgXlen, int imgYlen, int bandNum, int array, double buffArray[][5], GDALDataset* poSrcDS, GDALDataset* poDstDS, GByte* buffTmp, GByte buff[][5])
+void inputIMG(int imgXlen, int imgYlen, int bandNum, int array, float buffArray[][5], GDALDataset* poSrcDS, GDALDataset* poDstDS, float* buffTmp, float buff[][5])
 {
-	// 数组求和double类型
-	double sum[1] = { 0.0 };
-	// 数组求和GByte类型
-	GByte pre[1] = { 0 };
+	// 数组求和float类型
+	float sum[1] = { 0.0 };
 	// 多个for循环嵌套
 	for (int i = array / 2; i < imgYlen - array / 2; ++i)
 	{
@@ -24,16 +22,15 @@ void inputIMG(int imgXlen, int imgYlen, int bandNum, int array, double buffArray
 					{
 						//读取数组的像素点
 						poSrcDS->GetRasterBand(k + 1)->RasterIO(GF_Read,
-							i + a - array / 2, j + b - array / 2, 1, 1, buffTmp, 1, 1, GDT_Byte, 0, 0);
+							i + a - array / 2, j + b - array / 2, 1, 1, buffTmp, 1, 1, GDT_Float32, 0, 0);
 						buff[a][b] = buffTmp[0];
-						sum[0] += (double)buff[a][b] * buffArray[a][b];
+						sum[0] += buff[a][b] * buffArray[a][b];
 						//cout << buff[a][b] << "   " << sum[0] << endl;
 					}
 				}
 
-				pre[0] = (GByte)sum[0];
 				poDstDS->GetRasterBand(k + 1)->RasterIO(GF_Write,
-					i, j, 1, 1, pre, 1, 1, GDT_Byte, 0, 0);
+					i, j, 1, 1, sum, 1, 1, GDT_Float32, 0, 0);
 			}
 		}
 	}
@@ -56,14 +53,14 @@ int main()
 	// 输入图像路径
 	char* srcPath = "lena.jpg";
 	// 输出图像路径----卷积核一
-	char* dstPath_1 = "newlena1.tif";
-	char* dstPath_2 = "newlena2.tif";
-	char* dstPath_3 = "newlena3.tif";
-	char* dstPath_4 = "newlena4.tif";
-	char* dstPath_5 = "newlena5.tif";
-	char* dstPath_6 = "newlena6.tif";
+	char* dstPath_1 = "newlena1_1.tif";
+	char* dstPath_2 = "newlena2_1.tif";
+	char* dstPath_3 = "newlena3_1.tif";
+	char* dstPath_4 = "newlena4_1.tif";
+	char* dstPath_5 = "newlena5_1.tif";
+	char* dstPath_6 = "newlena6_1.tif";
 	// 图像内存存储
-	GByte* buffTmp;
+	float* buffTmp;
 	// 图像波段数
 	int bandNum;
 
@@ -97,15 +94,15 @@ int main()
 		dstPath_6, imgXlen, imgYlen, bandNum, GDT_Byte, NULL);
 
 	// 根据图像的宽度和高度分配内存
-	buffTmp = (GByte*)CPLMalloc(imgXlen*imgYlen * sizeof(GByte));
+	buffTmp = (float*)CPLMalloc(imgXlen*imgYlen * sizeof(float));
 	// 卷积核数组，记录数组维度
-	double buffArray_1[5][5] = {
+	float buffArray_1[5][5] = {
 		0, 1 * 0.2, 0, 0, 0,
 		1 * 0.2, 1 * 0.2, 1 * 0.2, 0, 0,
 		0, 1 * 0.2, 0, 0, 0
 	};
 	int array_1 = 3;
-	double buffArray_2[5][5] = {
+	float buffArray_2[5][5] = {
 		1 * 0.2, 0, 0, 0, 0,
 		0, 1 * 0.2, 0, 0 ,0,
 		0, 0, 1 * 0.2, 0, 0,
@@ -113,25 +110,25 @@ int main()
 		0, 0, 0, 0, 1 * 0.2
 	};
 	int array_2 = 5;
-	double buffArray_3[5][5] = {
+	float buffArray_3[5][5] = {
 		-1, -1, -1, 0, 0,
 		-1, 8, -1, 0, 0,
 		-1, -1, -1, 0, 0
 	};
 	int array_3 = 3;
-	double buffArray_4[5][5] = {
+	float buffArray_4[5][5] = {
 		-1, -1, -1, 0, 0,
 		-1, 9, -1, 0, 0,
 		-1, -1, -1, 0, 0
 	};
 	int array_4 = 3;
-	double buffArray_5[5][5] = {
+	float buffArray_5[5][5] = {
 		-1, -1, 0, 0, 0,
-		-1, 0, -1, 0, 0,
-		0, -1, -1, 0, 0
+		-1, 0, 1, 0, 0,
+		0, 1, 1, 0, 0
 	};
 	int array_5 = 3;
-	double buffArray_6[5][5] = {
+	float buffArray_6[5][5] = {
 		0.0120 / 25, 0.1253 / 25, 0.2736 / 25, 0.1253 / 25, 0.0120 / 25,
 		0.1253 / 25, 1.3054 / 25, 2.8514 / 25, 1.3054 / 25, 0.1253 / 25,
 		0.2736 / 25, 2.8514 / 25, 6.2279 / 25, 2.8514 / 25, 0.2736 / 25,
@@ -140,13 +137,13 @@ int main()
 	};
 	int array_6 = 5;
 	// 开创数组用于存储像素点，方便后面数组乘机
-	GByte buff[5][5];
+	float buff[5][5];
 
 	for (int i = 0; i < 5; ++i)
 	{
 		for (int j = 0; j < 5; ++j)
 		{
-			buff[i][j] = 0;
+			buff[i][j] = 0.0;
 		}
 	}
 
