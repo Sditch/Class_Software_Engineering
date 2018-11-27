@@ -1,7 +1,7 @@
-#<center>实验三：简单抠像</center>
-###一、实验要求
+# <center>实验三：简单抠像</center>
+### 一、实验要求
 提供两张图：space.jpg和superman.jpg，两张图的大小均为640*480像素。需要把superman.jpg中的超人抠出，加到 space.jpg 的太空背景中。
-###二、实验步骤
+### 二、实验步骤
 1、在原来实验二的代码基础上，修改定义，输入头像，定义图像内存存储等：
 	
 	// 输入头像
@@ -69,7 +69,7 @@
 	![](https://i.imgur.com/agvg1FC.png)
 
 
-###三、实验代码
+### 三、实验代码
 	#include <iostream>
 	using namespace std;
 	#include "./gdal/gdal_priv.h"
